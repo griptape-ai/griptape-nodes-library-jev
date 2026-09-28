@@ -59,6 +59,27 @@
                     "text"
                 ]
             }
+        },
+        {
+            "class_name": "PickOne",
+            "file_path": "jev_nodes/pick_one.py",
+            "metadata": {
+                "category": "JEV",
+                "description": "Pick the option that best fits some text and send the flow down that option's branch.",
+                "display_name": "Pick One (Choice)",
+                "tags": [
+                    "JEV",
+                    "TypeSafe",
+                    "Choice",
+                    "pick",
+                    "branch",
+                    "switch",
+                    "route",
+                    "decision",
+                    "classify",
+                    "text"
+                ]
+            }
         }
     ],
     "workflows": [

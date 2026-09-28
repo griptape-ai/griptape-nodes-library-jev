@@ -1,4 +1,3 @@
-import json
 from typing import Any
 
 from griptape_nodes.exe_types.core_types import (
@@ -13,40 +12,9 @@ from griptape_nodes.exe_types.node_types import AsyncResult, BaseNode
 from griptape_nodes.exe_types.param_types.parameter_bool import ParameterBool
 from griptape_nodes.exe_types.param_types.parameter_float import ParameterFloat
 from griptape_nodes.exe_types.param_types.parameter_string import ParameterString
-from griptape_nodes.retained_mode.griptape_nodes import GriptapeNodes
-from griptape_nodes.traits.options import Options
-from typesafe_sdk import (
-    Noul,
-    NoulAnswer,
-    NoulCriteria,
-    TypeSafeAuthenticationError,
-    TypeSafeClient,
-    TypeSafeError,
-)
+from typesafe_sdk import Noul, NoulAnswer, NoulCriteria
 
-API_KEY_NAME = "TYPESAFE_API_KEY"
-MODELS = ["jev-latest", "jev-preview"]
-QUESTION_ID = "answer"
-
-# JEV reads text only, so image, audio, and video outputs can't connect to Context.
-CONTEXT_INPUT_TYPES = ["str", "json", "dict", "list", "TextArtifact", "JsonArtifact"]
-
-
-def to_state(text: str | None) -> str | dict | list | None:
-    """Convert Context into JEV state, or None if it's empty.
-
-    ParameterString serializes connected dicts and lists to JSON, so parse JSON objects and arrays back
-    out. JEV reads structured state better than the same data as a string.
-    """
-    text = (text or "").strip()
-    if not text:
-        return None
-    if text[0] in "{[":
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            pass
-    return text
+from jev_nodes.common import advanced_group, ask_jev, context_parameter, missing_api_key_errors, to_state
 
 
 class AskYesNo(BaseNode):
@@ -69,18 +37,7 @@ class AskYesNo(BaseNode):
             )
         )
 
-        context = ParameterString(
-            name="context",
-            display_name="Context",
-            tooltip="The text JEV should read to answer the question. JSON works too. JEV accepts text only. "
-            "To ask about an image, describe it first with a node like Describe Image.",
-            default_value="",
-            multiline=True,
-            placeholder_text="Text to ask about",
-        )
-        # Keep ParameterString's converter but narrow its input types from "any".
-        context.input_types = CONTEXT_INPUT_TYPES
-        self.add_parameter(context)
+        self.add_parameter(context_parameter())
         self.add_parameter(
             ParameterString(
                 name="question",
@@ -186,28 +143,10 @@ class AskYesNo(BaseNode):
             )
         self.add_node_element(data_group)
 
-        with ParameterGroup(name="Advanced") as advanced_group:
-            advanced_group.ui_options = {"collapsed": True}
-            ParameterString(
-                name="model",
-                display_name="Model",
-                tooltip="jev-latest is the newest stable model. jev-preview is the newest release, stable or not.",
-                default_value=MODELS[0],
-                allow_input=False,
-                allow_output=False,
-                traits={Options(choices=MODELS)},
-            )
-        self.add_node_element(advanced_group)
+        self.add_node_element(advanced_group())
 
     def validate_before_node_run(self) -> list[Exception] | None:
-        if not GriptapeNodes.SecretsManager().get_secret(API_KEY_NAME, should_error_on_not_found=False):
-            return [
-                ValueError(
-                    f"{self.name}: {API_KEY_NAME} is not set. "
-                    "Add it in Settings > API Keys & Secrets. Get a key at https://console.typesafe.ai/keys"
-                )
-            ]
-        return None
+        return missing_api_key_errors(self.name)
 
     def process(self) -> AsyncResult[None]:
         # Clear the last run's answer so a failed call can't route down a stale branch.
@@ -230,17 +169,7 @@ class AskYesNo(BaseNode):
             criteria["false"] = no_means
         noul = Noul(instructions=question, criteria=criteria or None)
 
-        api_key = GriptapeNodes.SecretsManager().get_secret(API_KEY_NAME, should_error_on_not_found=False)
-        try:
-            with TypeSafeClient(api_key=api_key, model=self.get_parameter_value("model")) as client:
-                response = client.system_one(state=state, questions={QUESTION_ID: noul})
-        except TypeSafeAuthenticationError as e:
-            msg = f"{self.name}: TypeSafe rejected the API key. Check {API_KEY_NAME} in Settings > API Keys & Secrets."
-            raise RuntimeError(msg) from e
-        except TypeSafeError as e:
-            raise RuntimeError(f"{self.name}: JEV request failed: {e}") from e
-
-        result = response.answers[QUESTION_ID]
+        result = ask_jev(self.name, self.get_parameter_value("model"), state, noul)
         if not isinstance(result, NoulAnswer):
             raise RuntimeError(f"{self.name}: expected a yes/no answer from JEV, got {type(result).__name__}.")
 
@@ -250,7 +179,8 @@ class AskYesNo(BaseNode):
         self.parameter_output_values["answer"] = answer
 
     def get_next_control_output(self) -> Parameter | None:
+        # Returning None ends the flow here. Don't set stop_flow: the engine never clears it, so every
+        # later run would dead-end too.
         if "answer" not in self.parameter_output_values:
-            self.stop_flow = True
             return None
         return self.get_parameter_by_name("yes" if self.parameter_output_values["answer"] else "no")
