@@ -1,11 +1,13 @@
 [project]
-name = "example_nodes_template"
+name = "griptape-nodes-library-jev"
 version = "0.1.0"
-description = "Template for Users to create Custom Libraries and Nodes"
-authors = [{ name = "Your Name", email = "you@example.com" }]
+description = "Griptape Nodes for asking TypeSafe's JEV model typed questions about text"
+authors = [{ name = "Jason Schleifer", email = "jason.schleifer@gmail.com" }]
 readme = "README.md"
 requires-python = "~=3.12.0"
-dependencies = []
+dependencies = [
+    "typesafe-sdk>=0.7.2",
+]
 
 [tool.uv.sources]
 griptape-nodes-engine = { git = "https://github.com/griptape-ai/griptape-nodes-engine", rev = "latest" }
@@ -14,12 +16,16 @@ griptape-nodes-engine = { git = "https://github.com/griptape-ai/griptape-nodes-e
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["jev_nodes"]
+
 [dependency-groups]
 dev = ["pyright>=1.1.396", "pytest-asyncio>=0.21.0", "ruff>=0.8.0", "pytest", "griptape-nodes-engine"]
 
 [tool.ruff]
 line-length = 120
 target-version = "py312"
+extend-exclude = ["workflows/templates/*.py"]
 
 [tool.ruff.lint]
 select = [
@@ -46,6 +52,6 @@ line-ending = "auto"
 venvPath = "."
 venv = ".venv"
 include = ["."]
-exclude = [".venv", "**/node_modules", "**/__pycache__", "**/.*", "templates"]
+exclude = [".venv", "**/node_modules", "**/__pycache__", "**/.*", "templates", "workflows/"]
 pythonVersion = "3.12"
 reportIncompatibleMethodOverride = false
