@@ -25,6 +25,7 @@ dev = ["pyright>=1.1.396", "pytest-asyncio>=0.21.0", "ruff>=0.8.0", "pytest", "g
 [tool.ruff]
 line-length = 120
 target-version = "py312"
+extend-exclude = ["workflows/templates/*.py"]
 
 [tool.ruff.lint]
 select = [
@@ -51,6 +52,6 @@ line-ending = "auto"
 venvPath = "."
 venv = ".venv"
 include = ["."]
-exclude = [".venv", "**/node_modules", "**/__pycache__", "**/.*", "templates"]
+exclude = [".venv", "**/node_modules", "**/__pycache__", "**/.*", "templates", "workflows/"]
 pythonVersion = "3.12"
 reportIncompatibleMethodOverride = false

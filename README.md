@@ -12,7 +12,7 @@ Asks a yes/no question about some text and sends the flow down the **Yes** or **
 
 | Parameter | What it does |
 |---|---|
-| **Context** | The text to ask about. Type it in or connect any text output. JSON works too. |
+| **Context** | The text to ask about. Type it in or connect any text output. JSON works too. It also has an output, so you can pass the same text on to the next node. |
 | **Question** | A yes/no question about the context, such as "Does the customer ask for a refund?" |
 | **Yes means** / **No means** | Optional, in the collapsed **Define Yes and No** group. Short descriptions of what should count as yes and as no. Fill in either or both. |
 | **Say Yes at or above** | How sure JEV must be before the flow takes the Yes branch. The default is 0.5. Raise it to say Yes only when JEV is very sure. Lower it to say Yes on weaker signals. |

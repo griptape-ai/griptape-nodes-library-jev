@@ -46,8 +46,22 @@
             "metadata": {
                 "category": "JEV",
                 "description": "Ask a yes/no question about some text and send the flow down the Yes or No branch.",
-                "display_name": "Ask Yes/No (Noul)"
+                "display_name": "Ask Yes/No (Noul)",
+                "tags": [
+                    "JEV",
+                    "TypeSafe",
+                    "Noul",
+                    "yes/no",
+                    "branch",
+                    "if",
+                    "decision",
+                    "classify",
+                    "text"
+                ]
             }
         }
+    ],
+    "workflows": [
+        "workflows/templates/jev_prompt_clearance.py"
     ]
 }

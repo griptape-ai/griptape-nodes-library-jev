@@ -77,7 +77,6 @@ class AskYesNo(BaseNode):
             default_value="",
             multiline=True,
             placeholder_text="Text to ask about",
-            allow_output=False,
         )
         # Keep ParameterString's converter but narrow its input types from "any".
         context.input_types = CONTEXT_INPUT_TYPES
@@ -104,7 +103,7 @@ class AskYesNo(BaseNode):
                 "Use it when the line between yes and no is subtle.",
                 default_value="",
                 multiline=True,
-                placeholder_text="Mentions a prior attempt, ticket, or asking before",
+                placeholder_text="What should count as Yes?",
                 allow_output=False,
             )
             ParameterString(
@@ -114,7 +113,7 @@ class AskYesNo(BaseNode):
                 "Use it when the line between yes and no is subtle.",
                 default_value="",
                 multiline=True,
-                placeholder_text="No sign of any previous contact",
+                placeholder_text="What should count as No?",
                 allow_output=False,
             )
         self.add_node_element(criteria_group)
