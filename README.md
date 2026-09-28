@@ -14,6 +14,7 @@ Asks a yes/no question about some text and sends the flow down the **Yes** or **
 |---|---|
 | **Context** | The text to ask about. Type it in or connect any text output. JSON works too. |
 | **Question** | A yes/no question about the context, such as "Does the customer ask for a refund?" |
+| **Yes means** / **No means** | Optional, in the collapsed **Define Yes and No** group. Short descriptions of what should count as yes and as no. Fill in either or both. |
 | **Say Yes at or above** | How sure JEV must be before the flow takes the Yes branch. The default is 0.5. Raise it to say Yes only when JEV is very sure. Lower it to say Yes on weaker signals. |
 | **Answer** | True or false. |
 | **Probability** | JEV's probability that the answer is yes, from 0 to 1. A value near 0.5 means yes and no are about equally likely. |
@@ -26,6 +27,7 @@ The collapsed **Advanced** group has the model choice. `jev-latest` is the newes
 
 - Ask one narrow thing per question. "Does the message ask for a refund?" works better than "Is this a refund request that needs urgent attention?"
 - Give JEV everything it needs in the Context. It only sees what you connect.
+- Most questions don't need **Yes means** and **No means**. Use them when the line between yes and no is subtle. For "Has the customer contacted support before?", does mentioning it once in passing count? Say so in **Yes means**. Try a few real examples with and without them, and keep whichever works better.
 - For structured context, use JSON and refer to fields with backticks, such as "Does `ticket.body` mention a duplicate charge?"
 - To pick a value for **Say Yes at or above**, run a few real examples and look at the **Probability** output.
 

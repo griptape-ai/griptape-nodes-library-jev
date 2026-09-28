@@ -15,7 +15,14 @@ from griptape_nodes.exe_types.param_types.parameter_float import ParameterFloat
 from griptape_nodes.exe_types.param_types.parameter_string import ParameterString
 from griptape_nodes.retained_mode.griptape_nodes import GriptapeNodes
 from griptape_nodes.traits.options import Options
-from typesafe_sdk import Noul, NoulAnswer, TypeSafeAuthenticationError, TypeSafeClient, TypeSafeError
+from typesafe_sdk import (
+    Noul,
+    NoulAnswer,
+    NoulCriteria,
+    TypeSafeAuthenticationError,
+    TypeSafeClient,
+    TypeSafeError,
+)
 
 API_KEY_NAME = "TYPESAFE_API_KEY"
 MODELS = ["jev-latest", "jev-preview"]
@@ -87,6 +94,31 @@ class AskYesNo(BaseNode):
                 allow_output=False,
             )
         )
+
+        with ParameterGroup(name="Define Yes and No (optional)") as criteria_group:
+            criteria_group.ui_options = {"collapsed": True}
+            ParameterString(
+                name="yes_means",
+                display_name="Yes means",
+                tooltip="Optional. Describe what should count as yes. Most questions don't need this. "
+                "Use it when the line between yes and no is subtle.",
+                default_value="",
+                multiline=True,
+                placeholder_text="Mentions a prior attempt, ticket, or asking before",
+                allow_output=False,
+            )
+            ParameterString(
+                name="no_means",
+                display_name="No means",
+                tooltip="Optional. Describe what should count as no. Most questions don't need this. "
+                "Use it when the line between yes and no is subtle.",
+                default_value="",
+                multiline=True,
+                placeholder_text="No sign of any previous contact",
+                allow_output=False,
+            )
+        self.add_node_element(criteria_group)
+
         self.add_parameter(
             ParameterFloat(
                 name="threshold",
@@ -191,10 +223,18 @@ class AskYesNo(BaseNode):
         if not question:
             raise ValueError(f"{self.name}: Question is empty.")
 
+        # Only send the sides the user filled in. JEV accepts either one alone.
+        criteria: NoulCriteria = {}
+        if yes_means := (self.get_parameter_value("yes_means") or "").strip():
+            criteria["true"] = yes_means
+        if no_means := (self.get_parameter_value("no_means") or "").strip():
+            criteria["false"] = no_means
+        noul = Noul(instructions=question, criteria=criteria or None)
+
         api_key = GriptapeNodes.SecretsManager().get_secret(API_KEY_NAME, should_error_on_not_found=False)
         try:
             with TypeSafeClient(api_key=api_key, model=self.get_parameter_value("model")) as client:
-                response = client.system_one(state=state, questions={QUESTION_ID: Noul(instructions=question)})
+                response = client.system_one(state=state, questions={QUESTION_ID: noul})
         except TypeSafeAuthenticationError as e:
             msg = f"{self.name}: TypeSafe rejected the API key. Check {API_KEY_NAME} in Settings > API Keys & Secrets."
             raise RuntimeError(msg) from e
