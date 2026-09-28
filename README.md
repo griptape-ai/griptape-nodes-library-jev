@@ -10,6 +10,8 @@ JEV doesn't write text. You give it some text and a narrow question, and it retu
 
 Asks a yes/no question about some text and sends the flow down the **Yes** or **No** branch.
 
+![Ask Yes/No (Noul)](images/jev_prompt_clearance.webp)
+
 | Parameter | What it does |
 |---|---|
 | **Context** | The text to ask about. Type it in or connect any text output. JSON works too. It also has an output, so you can pass the same text on to the next node. |
