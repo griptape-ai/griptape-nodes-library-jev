@@ -47,6 +47,31 @@ Each row in **Options** has its own output too, which carries that row's text. C
 
 The collapsed **Advanced** group has the model choice.
 
+### Rate (Score)
+
+Rates some text against levels you describe and sends the flow down the branch for the level it scores.
+
+| Parameter | What it does |
+|---|---|
+| **Context** | The text to rate, the same as in Ask Yes/No. It also has an output. |
+| **Question** | Optional. What JEV should rate, such as "How urgent is this message?" |
+| **Levels** | One level per row, lowest first, up to 10. The first row is level 1, the next is level 2, and so on. Describe the situation at each level, like `Cosmetic issue, nothing is broken`, `Broken, but a workaround exists`, `Blocks people from working`. To name a level, put a label before a colon, like `Minor: broken, but a workaround exists`. |
+| **Score** | JEV's score. It weighs every level by its probability, so it can fall between levels, like 1.7. |
+| **Level** | The score rounded to the nearest level, as a whole number. |
+| **Level Description** | The description of that level. |
+| **Confidence** | How sure JEV is of its score, from 0 to 1. |
+| **Probabilities** | JEV's probability for every level, keyed by level number. |
+
+Each level gets its own flow output. A level with a label uses it, like **Minor**. A level without one is named by its number, like **Level 1**. The flow takes the output for **Level**, the rounded score. Only the description after the colon is sent to JEV, so labels don't affect the score.
+
+To make a gate, connect several levels to the same node. For example, connect the top two levels to the node that escalates a ticket, and the rest to the node that files it. Levels you leave unconnected end the flow there.
+
+Every data output is set on every run, whichever branch the flow takes.
+
+Read **Probabilities** and **Confidence** alongside **Score**. A score of 2.0 can mean JEV is sure of level 2, or that it's split evenly between levels 1 and 3.
+
+The collapsed **Advanced** group has the model choice.
+
 ## Tips for good questions
 
 - Ask one narrow thing per question. "Does the message ask for a refund?" works better than "Is this a refund request that needs urgent attention?"
@@ -55,6 +80,9 @@ The collapsed **Advanced** group has the model choice.
 - For structured context, use JSON and refer to fields with backticks, such as "Does `ticket.body` mention a duplicate charge?"
 - To pick a value for **Say Yes at or above**, run a few real examples and look at the **Probability** output.
 - For **Pick One**, make the options distinct. If two options overlap, add descriptions that say where the line between them is. Labels can't contain a colon, because everything after the first colon is the description.
+- For **Rate**, describe situations, not degrees. `Broken, but a workaround exists` works. `Moderately severe` doesn't, and plain numbers like `0`, `1`, `2` work worst of all. JEV judges each level on its own, without seeing its number or its neighbors.
+- Rate one thing per question. To judge several things, like severity and tone, use one Rate node for each.
+- Empty rows in **Levels** are skipped, so the rows after one move down a level.
 
 ## Limits
 

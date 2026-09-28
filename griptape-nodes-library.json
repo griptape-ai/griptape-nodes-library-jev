@@ -80,6 +80,28 @@
                     "text"
                 ]
             }
+        },
+        {
+            "class_name": "Rate",
+            "file_path": "jev_nodes/rate.py",
+            "metadata": {
+                "category": "JEV",
+                "description": "Rate some text against levels you describe, and send the flow down the branch for the level it scores.",
+                "display_name": "Rate (Score)",
+                "tags": [
+                    "JEV",
+                    "TypeSafe",
+                    "Score",
+                    "rate",
+                    "rating",
+                    "grade",
+                    "rubric",
+                    "branch",
+                    "route",
+                    "quality",
+                    "text"
+                ]
+            }
         }
     ],
     "workflows": [
