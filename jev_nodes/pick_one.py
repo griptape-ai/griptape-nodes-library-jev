@@ -70,6 +70,17 @@ class PickOne(BaseNode):
             )
         )
         self.add_parameter(
+            ParameterString(
+                name="description",
+                display_name="Description",
+                tooltip="The description of the option JEV picked, the text after its colon. Empty if the "
+                "option has no description.",
+                allow_input=False,
+                allow_property=False,
+                placeholder_text="The description of the option JEV picked.",
+            )
+        )
+        self.add_parameter(
             ParameterFloat(
                 name="confidence",
                 display_name="Confidence",
@@ -208,6 +219,7 @@ class PickOne(BaseNode):
     def process(self) -> AsyncResult[None]:
         # Clear the last run's pick so a failed call can't route down a stale branch.
         self.parameter_output_values.pop("choice", None)
+        self.parameter_output_values.pop("description", None)
         yield lambda: self._ask()
 
     def _ask(self) -> None:
@@ -215,7 +227,8 @@ class PickOne(BaseNode):
         if state is None:
             raise ValueError(f"{self.name}: Context is empty. Connect or type the text to ask about.")
         question = (self.get_parameter_value("question") or "").strip()
-        choice = Choice(criteria=self._criteria(), instructions=question or None)
+        criteria = self._criteria()
+        choice = Choice(criteria=criteria, instructions=question or None)
 
         result = ask_jev(self.name, self.get_parameter_value("model"), state, choice)
         if not isinstance(result, ChoiceAnswer):
@@ -223,6 +236,7 @@ class PickOne(BaseNode):
 
         self.parameter_output_values["confidence"] = result.confidence
         self.parameter_output_values["probabilities"] = dict(result.probabilities)
+        self.parameter_output_values["description"] = criteria.get(result.choice) or ""
         self.parameter_output_values["choice"] = result.choice
 
     def get_next_control_output(self) -> Parameter | None:

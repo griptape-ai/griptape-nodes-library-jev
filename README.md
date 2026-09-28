@@ -35,6 +35,7 @@ Picks the option that best fits some text and sends the flow down that option's 
 | **Question** | Optional. What JEV should decide, such as "Which department should handle this note?" |
 | **Options** | One option per row. Click **Add item to Options** for a new row. Write a short label like `Lighting`, or add a description after a colon, like `Lighting: notes about lights, shadows, or exposure`. |
 | **Choice** | The label JEV picked. |
+| **Description** | The description of the option JEV picked, the text after its colon. Empty if that option has no description. |
 | **Confidence** | How sure JEV is of its pick, from 0 to 1. A low value means the text could fit another option too. |
 | **Probabilities** | JEV's probability for every option, keyed by label. |
 
