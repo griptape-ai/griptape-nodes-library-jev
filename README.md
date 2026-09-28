@@ -29,6 +29,8 @@ The collapsed **Advanced** group has the model choice. `jev-latest` is the newes
 
 Picks the option that best fits some text and sends the flow down that option's branch.
 
+![Pick One (Choice)](images/jev_pick_the_look.webp)
+
 | Parameter | What it does |
 |---|---|
 | **Context** | The text to ask about, the same as in Ask Yes/No. It also has an output. |
