@@ -25,6 +25,28 @@ The collapsed **Data Outputs** group works like the If/Else node. Connect someth
 
 The collapsed **Advanced** group has the model choice. `jev-latest` is the newest stable model and is the right choice for most flows.
 
+### Pick One (Choice)
+
+Picks the option that best fits some text and sends the flow down that option's branch.
+
+![Pick One (Choice)](images/jev_pick_the_look.webp)
+
+| Parameter | What it does |
+|---|---|
+| **Context** | The text to ask about, the same as in Ask Yes/No. It also has an output. |
+| **Question** | Optional. What JEV should decide, such as "Which department should handle this note?" |
+| **Options** | One option per row. Click **Add item to Options** for a new row. Write a short label like `Lighting`, or add a description after a colon, like `Lighting: notes about lights, shadows, or exposure`. |
+| **Choice** | The label JEV picked. |
+| **Description** | The description of the option JEV picked, the text after its colon. Empty if that option has no description. |
+| **Confidence** | How sure JEV is of its pick, from 0 to 1. A low value means the text could fit another option too. |
+| **Probabilities** | JEV's probability for every option, keyed by label. |
+
+Each option gets its own flow output, labeled to match. Connect each one to the node that should run for that option. You can rename, reorder, or delete options, and the wires stay with their option. Deleting an option also deletes its wires.
+
+Each row in **Options** has its own output too, which carries that row's text. Connect it to a node on that option's branch, such as an Agent's context, to pass the option along.
+
+The collapsed **Advanced** group has the model choice.
+
 ## Tips for good questions
 
 - Ask one narrow thing per question. "Does the message ask for a refund?" works better than "Is this a refund request that needs urgent attention?"
@@ -32,6 +54,7 @@ The collapsed **Advanced** group has the model choice. `jev-latest` is the newes
 - Most questions don't need **Yes means** and **No means**. Use them when the line between yes and no is subtle. For "Has the customer contacted support before?", does mentioning it once in passing count? Say so in **Yes means**. Try a few real examples with and without them, and keep whichever works better.
 - For structured context, use JSON and refer to fields with backticks, such as "Does `ticket.body` mention a duplicate charge?"
 - To pick a value for **Say Yes at or above**, run a few real examples and look at the **Probability** output.
+- For **Pick One**, make the options distinct. If two options overlap, add descriptions that say where the line between them is. Labels can't contain a colon, because everything after the first colon is the description.
 
 ## Limits
 
