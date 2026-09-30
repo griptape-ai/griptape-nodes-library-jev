@@ -51,20 +51,24 @@ The collapsed **Advanced** group has the model choice.
 
 Rates some text against levels you describe and sends the flow down the branch for the level it scores.
 
+![Rate (Score)](images/jev_shot_check.webp)
+
+In the **JEV Shot Check** template, Rate reads a shot description written for an image generator and rates how ready it is: **Vague**, **Partial**, or **Ready**. Vague and Partial shots go to an Agent that fills in the camera angle, framing, and lighting before the image is made. Ready shots go straight to the image node.
+
 | Parameter | What it does |
 |---|---|
 | **Context** | The text to rate, the same as in Ask Yes/No. It also has an output. |
-| **Question** | Optional. What JEV should rate, such as "How urgent is this message?" |
-| **Levels** | One level per row, lowest first, up to 10. The first row is level 1, the next is level 2, and so on. Describe the situation at each level, like `Cosmetic issue, nothing is broken`, `Broken, but a workaround exists`, `Blocks people from working`. To name a level, put a label before a colon, like `Minor: broken, but a workaround exists`. |
+| **Question** | Optional. What JEV should rate, such as "How ready is this shot description to hand to an image generator?" |
+| **Levels** | One level per row, lowest first, up to 10. The first row is level 1, the next is level 2, and so on. Describe what the text contains at each level, like `names a subject, but not what's happening`, `describes the action, but not the camera angle or lighting`, `gives the action, camera angle, and lighting`. To name a level, put a label before a colon, like `Partial: describes the action, but not the camera angle or lighting`. |
 | **Score** | JEV's score. It weighs every level by its probability, so it can fall between levels, like 1.7. |
 | **Level** | The score rounded to the nearest level, as a whole number. |
 | **Level Description** | The description of that level. |
 | **Confidence** | How sure JEV is of its score, from 0 to 1. |
 | **Probabilities** | JEV's probability for every level, keyed by level number. |
 
-Each level gets its own flow output. A level with a label uses it, like **Minor**. A level without one is named by its number, like **Level 1**. The flow takes the output for **Level**, the rounded score. Only the description after the colon is sent to JEV, so labels don't affect the score.
+Each level gets its own flow output. A level with a label uses it, like **Partial**. A level without one is named by its number, like **Level 1**. The flow takes the output for **Level**, the rounded score. Only the description after the colon is sent to JEV, so labels don't affect the score.
 
-To make a gate, connect several levels to the same node. For example, connect the top two levels to the node that escalates a ticket, and the rest to the node that files it. Levels you leave unconnected end the flow there.
+To make a gate, connect several levels to the same node. Shot Check connects **Vague** and **Partial** to the same Agent, so both get rewritten. Levels you leave unconnected end the flow there.
 
 Every data output is set on every run, whichever branch the flow takes.
 
@@ -80,7 +84,7 @@ The collapsed **Advanced** group has the model choice.
 - For structured context, use JSON and refer to fields with backticks, such as "Does `ticket.body` mention a duplicate charge?"
 - To pick a value for **Say Yes at or above**, run a few real examples and look at the **Probability** output.
 - For **Pick One**, make the options distinct. If two options overlap, add descriptions that say where the line between them is. Labels can't contain a colon, because everything after the first colon is the description.
-- For **Rate**, describe situations, not degrees. `Broken, but a workaround exists` works. `Moderately severe` doesn't, and plain numbers like `0`, `1`, `2` work worst of all. JEV judges each level on its own, without seeing its number or its neighbors.
+- For **Rate**, describe situations, not degrees. `Describes the action, but not the camera angle or lighting` works. `Mostly complete` doesn't, and plain numbers like `0`, `1`, `2` work worst of all. JEV judges each level on its own, without seeing its number or its neighbors.
 - Rate one thing per question. To judge several things, like severity and tone, use one Rate node for each.
 - Empty rows in **Levels** are skipped, so the rows after one move down a level.
 

@@ -106,6 +106,7 @@
     ],
     "workflows": [
         "workflows/templates/jev_prompt_clearance.py",
-        "workflows/templates/jev_pick_the_look.py"
+        "workflows/templates/jev_pick_the_look.py",
+        "workflows/templates/jev_shot_check.py"
     ]
 }
