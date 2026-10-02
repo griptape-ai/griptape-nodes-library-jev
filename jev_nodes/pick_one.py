@@ -5,9 +5,16 @@ from griptape_nodes.exe_types.node_types import AsyncResult
 from griptape_nodes.exe_types.param_types.parameter_float import ParameterFloat
 from griptape_nodes.exe_types.param_types.parameter_json import ParameterJson
 from griptape_nodes.exe_types.param_types.parameter_string import ParameterString
-from typesafe_sdk import Choice, ChoiceAnswer
 
-from jev_nodes.common import advanced_group, ask_jev, context_parameter, missing_api_key_errors, to_state
+from jev_nodes.common import (
+    ChoiceAnswer,
+    advanced_group,
+    ask_jev,
+    context_parameter,
+    make_question,
+    missing_api_key_errors,
+    to_state,
+)
 from jev_nodes.row_outputs import RowOutputsMixin, parse_row
 
 MAX_OPTIONS = 255
@@ -123,14 +130,14 @@ class PickOne(RowOutputsMixin):
             raise ValueError(f"{self.name}: Context is empty. Connect or type the text to ask about.")
         question = (self.get_parameter_value("question") or "").strip()
         criteria = self._criteria()
-        choice = Choice(criteria=criteria, instructions=question or None)
+        choice = make_question("choice", instructions=question or None, criteria=criteria)
 
         result = ask_jev(self.name, self.get_parameter_value("model"), state, choice)
         if not isinstance(result, ChoiceAnswer):
             raise RuntimeError(f"{self.name}: expected a choice from JEV, got {type(result).__name__}.")
 
         self.parameter_output_values["confidence"] = result.confidence
-        self.parameter_output_values["probabilities"] = dict(result.probabilities)
+        self.parameter_output_values["probabilities"] = result.probabilities
         self.parameter_output_values["description"] = criteria.get(result.choice) or ""
         self.parameter_output_values["choice"] = result.choice
 
