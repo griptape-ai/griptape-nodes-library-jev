@@ -6,9 +6,16 @@ from griptape_nodes.exe_types.param_types.parameter_float import ParameterFloat
 from griptape_nodes.exe_types.param_types.parameter_int import ParameterInt
 from griptape_nodes.exe_types.param_types.parameter_json import ParameterJson
 from griptape_nodes.exe_types.param_types.parameter_string import ParameterString
-from typesafe_sdk import Score, ScoreAnswer
 
-from jev_nodes.common import advanced_group, ask_jev, context_parameter, missing_api_key_errors, to_state
+from jev_nodes.common import (
+    ScoreAnswer,
+    advanced_group,
+    ask_jev,
+    context_parameter,
+    make_question,
+    missing_api_key_errors,
+    to_state,
+)
 from jev_nodes.row_outputs import RowOutputsMixin, parse_row
 
 # The API accepts up to 10 levels.
@@ -136,7 +143,7 @@ class Rate(RowOutputsMixin):
             raise ValueError(f"{self.name}: Levels has {len(rows)} levels. JEV accepts up to {MAX_LEVELS}.")
         descriptions = [level_description(text) for _, text in rows]
         question = (self.get_parameter_value("question") or "").strip()
-        score = Score(criteria=descriptions, instructions=question or None)
+        score = make_question("score", instructions=question or None, criteria=descriptions)
 
         result = ask_jev(self.name, self.get_parameter_value("model"), state, score)
         if not isinstance(result, ScoreAnswer):

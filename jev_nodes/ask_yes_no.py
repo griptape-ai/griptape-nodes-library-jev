@@ -12,9 +12,16 @@ from griptape_nodes.exe_types.node_types import AsyncResult, BaseNode
 from griptape_nodes.exe_types.param_types.parameter_bool import ParameterBool
 from griptape_nodes.exe_types.param_types.parameter_float import ParameterFloat
 from griptape_nodes.exe_types.param_types.parameter_string import ParameterString
-from typesafe_sdk import Noul, NoulAnswer, NoulCriteria
 
-from jev_nodes.common import advanced_group, ask_jev, context_parameter, missing_api_key_errors, to_state
+from jev_nodes.common import (
+    NoulAnswer,
+    advanced_group,
+    ask_jev,
+    context_parameter,
+    make_question,
+    missing_api_key_errors,
+    to_state,
+)
 
 
 class AskYesNo(BaseNode):
@@ -162,12 +169,12 @@ class AskYesNo(BaseNode):
             raise ValueError(f"{self.name}: Question is empty.")
 
         # Only send the sides the user filled in. JEV accepts either one alone.
-        criteria: NoulCriteria = {}
+        criteria: dict[str, str] = {}
         if yes_means := (self.get_parameter_value("yes_means") or "").strip():
             criteria["true"] = yes_means
         if no_means := (self.get_parameter_value("no_means") or "").strip():
             criteria["false"] = no_means
-        noul = Noul(instructions=question, criteria=criteria or None)
+        noul = make_question("noul", instructions=question, criteria=criteria or None)
 
         result = ask_jev(self.name, self.get_parameter_value("model"), state, noul)
         if not isinstance(result, NoulAnswer):

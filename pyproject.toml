@@ -5,9 +5,7 @@ description = "Griptape Nodes for asking TypeSafe's JEV model typed questions ab
 authors = [{ name = "Jason Schleifer", email = "jason.schleifer@gmail.com" }]
 readme = "README.md"
 requires-python = "~=3.12.0"
-dependencies = [
-    "typesafe-sdk>=0.7.2",
-]
+dependencies = []
 
 [tool.uv.sources]
 griptape-nodes-engine = { git = "https://github.com/griptape-ai/griptape-nodes-engine", rev = "latest" }

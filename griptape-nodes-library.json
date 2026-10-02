@@ -13,9 +13,7 @@
             "JEV"
         ],
         "dependencies": {
-            "pip_dependencies": [
-                "typesafe-sdk>=0.7.2"
-            ]
+            "pip_dependencies": []
         }
     },
     "settings": [
